@@ -9,7 +9,7 @@ def predict_activity(features):
     Predict suspicious activity using the trained model
     """
     
-    # Convert features into numpy array
+    # Convert features into numpy arra
     features = np.array(features).reshape(1, -1)
     
     # Model prediction
