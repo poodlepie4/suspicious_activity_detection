@@ -7,4 +7,4 @@ path = kagglehub.dataset_download("odins0n/ucf-crime-dataset")
 print("Dataset downloaded to:", path)
 
 # list files
-print(os.listdir(path))
+
