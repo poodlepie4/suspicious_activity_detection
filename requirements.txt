@@ -1,7 +1,4 @@
 flask
 numpy
-pandas
 scikit-learn
 opencv-python
-gunicorn
-kagglehub
