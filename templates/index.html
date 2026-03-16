@@ -1,7 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Suspicious Activity Detection</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background-color:#f4f6f9;
+    text-align:center;
+}
+
+.container{
+    width:400px;
+    margin:120px auto;
+    padding:30px;
+    background:white;
+    border-radius:10px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.2);
+}
+
+h2{
+    color:#2c3e50;
+}
+
+input{
+    width:90%;
+    padding:10px;
+    margin:8px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+button{
+    padding:10px 20px;
+    background-color:#3498db;
+    color:white;
+    border:none;
+    border-radius:5px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background-color:#2980b9;
+}
+
+.result{
+    margin-top:20px;
+    font-size:18px;
+    color:#e74c3c;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Suspicious Activity Detection System</h2>
+
 <form action="/predict" method="post">
-    <input type="text" name="feature1" placeholder="Enter value">
-    <input type="text" name="feature2" placeholder="Enter value">
-    <button type="submit">Predict</button>
+
+<input type="text" name="feature1" placeholder="Feature 1"><br>
+
+<input type="text" name="feature2" placeholder="Feature 2"><br>
+
+<input type="text" name="feature3" placeholder="Feature 3"><br>
+
+<button type="submit">Predict</button>
+
 </form>
 
-<h3>{{ prediction_text }}</h3>
+{% if prediction %}
+<div class="result">
+<h3>{{ prediction }}</h3>
+</div>
+{% endif %}
+
+</div>
+
+</body>
+</html>
