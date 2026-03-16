@@ -3,7 +3,34 @@
 <head>
     <title>Suspicious Activity Detection</title>
 
-<style>
+<style><!DOCTYPE html>
+<html>
+<head>
+<title>Suspicious Activity Detection</title>
+</head>
+
+<body>
+
+<h2>Suspicious Activity Detection System</h2>
+
+<form action="/predict" method="post" enctype="multipart/form-data">
+
+<label>Upload CCTV Frame or Image</label><br><br>
+
+<input type="file" name="file" accept="image/*" required>
+
+<br><br>
+
+<button type="submit">Detect Activity</button>
+
+</form>
+
+{% if prediction %}
+<h3>Result: {{ prediction }}</h3>
+{% endif %}
+
+</body>
+</html>
 
 body{
     font-family: Arial, sans-serif;
