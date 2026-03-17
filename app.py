@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request
-import pickle
 import numpy as np
+import cv2
+import os
+from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 
-model = pickle.load(open("model/model.pkl", "rb"))
+# Load CNN model
+model = load_model("model/model.h5")
 
 @app.route("/")
 def home():
@@ -13,19 +16,74 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    try:
+        file = request.files["file"]
 
-    features = [float(x) for x in request.form.values()]
-    final_features = np.array(features).reshape(1, -1)
+        if file.filename == "":
+            return "No file uploaded"
 
-    prediction = model.predict(final_features)
+        filename = file.filename.lower()
 
-    if prediction[0] == 1:
-        result = "Suspicious Activity Detected"
-    else:
-        result = "Normal Activity"
+        # ---------------- IMAGE ----------------
+        if filename.endswith(('.png', '.jpg', '.jpeg')):
 
-    return render_template("index.html", prediction=result)
+            img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+
+            if img is None:
+                return "Invalid image"
+
+            img = cv2.resize(img, (64,64))
+            img = img / 255.0
+            img = np.expand_dims(img, axis=0)
+
+            prediction = model.predict(img)[0][0]
+
+        # ---------------- VIDEO ----------------
+        elif filename.endswith(('.mp4', '.avi', '.mov')):
+
+            video_path = "temp_video.mp4"
+            file.save(video_path)
+
+            cap = cv2.VideoCapture(video_path)
+
+            predictions = []
+
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+
+                frame = cv2.resize(frame, (64,64))
+                frame = frame / 255.0
+                frame = np.expand_dims(frame, axis=0)
+
+                pred = model.predict(frame)[0][0]
+                predictions.append(pred)
+
+            cap.release()
+            os.remove(video_path)
+
+            if len(predictions) == 0:
+                return "Error processing video"
+
+            prediction = sum(predictions) / len(predictions)
+
+        else:
+            return "Unsupported file type"
+
+        # ---------------- RESULT ----------------
+        if prediction > 0.5:
+            result = "Suspicious Activity Detected"
+        else:
+            result = "Normal Activity"
+
+        return render_template("index.html", prediction=result)
+
+    except Exception as e:
+        return str(e)
 
 
 if __name__ == "__main__":
-    app.run()
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
