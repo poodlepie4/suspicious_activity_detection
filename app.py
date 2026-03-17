@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 # Load CNN model
 model = load_model("model/model.h5")
+print("Model loaded successfully")
 
 @app.route("/")
 def home():
