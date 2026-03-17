@@ -7,7 +7,7 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 
 # Load CNN model
-model = load_model("model/model.h5")
+model = load_model("model/model.keras")
 print("Model loaded successfully")
 
 @app.route("/")
