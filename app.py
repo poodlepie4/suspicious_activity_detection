@@ -9,6 +9,10 @@ app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB
 print("Files in root:", os.listdir())
 print("Files in model folder:", os.listdir("model"))
 
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
+os.environ["TF_NUM_INTEROP_THREADS"] = "1"
+
 # Load CNN model
 model = load_model("model/model.keras")
 print("Model loaded successfully")
@@ -38,8 +42,8 @@ def predict():
             if img is None:
                 return "Image decode failed"
         
-            img = cv2.resize(img, (64,64))
-            img = img / 255.0
+            img = cv2.resize(img, (32,32))
+            img = img.astype("float32") / 255.0
             img = np.expand_dims(img, axis=0)
         
             pred = model.predict(img)
