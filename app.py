@@ -21,7 +21,7 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        file = request.files["file"]
+        file = request.files.get("file")
 
         if file.filename == "":
             return "No file uploaded"
