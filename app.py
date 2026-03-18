@@ -5,6 +5,7 @@ import os
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB
 print("Files in root:", os.listdir())
 print("Files in model folder:", os.listdir("model"))
 
@@ -30,16 +31,21 @@ def predict():
         # ---------------- IMAGE ----------------
         if filename.endswith(('.png', '.jpg', '.jpeg')):
 
-            img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-
+            file_bytes = file.read()
+            np_arr = np.frombuffer(file_bytes, np.uint8)
+            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    
             if img is None:
-                return "Invalid image"
-
+                return "Image decode failed"
+        
             img = cv2.resize(img, (64,64))
             img = img / 255.0
             img = np.expand_dims(img, axis=0)
-
-            prediction = model.predict(img)[0][0]
+        
+            pred = model.predict(img)
+            print("Raw prediction:", pred)
+        
+            prediction = float(pred[0][0])
 
         # ---------------- VIDEO ----------------
         elif filename.endswith(('.mp4', '.avi', '.mov')):
