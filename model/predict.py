@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # Load CNN model (.h5)
-model = load_model("model/model.h5")
+model = load_model("model/model.keras")
 
 @app.route("/")
 def home():
