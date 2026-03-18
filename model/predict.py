@@ -29,10 +29,10 @@ def predict():
             return "Invalid image file"
 
         # resize to training size
-        img = cv2.resize(img, (64,64))
+        img = cv2.resize(img, (32,32))
 
         # normalize
-        img = img / 255.0
+        img = img.astype("float32") / 255.0
 
         # reshape for model
         img = np.expand_dims(img, axis=0)
