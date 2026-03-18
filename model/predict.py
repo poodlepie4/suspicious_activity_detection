@@ -38,7 +38,7 @@ def predict():
         img = np.expand_dims(img, axis=0)
 
         # prediction
-        prediction = model.predict(img)
+        prediction = model.predict(img, training=False)
 
         if prediction[0][0] > 0.5:
             result = "Suspicious Activity Detected"
