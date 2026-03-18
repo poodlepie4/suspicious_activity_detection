@@ -5,6 +5,8 @@ import os
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
+print("Files in root:", os.listdir())
+print("Files in model folder:", os.listdir("model"))
 
 # Load CNN model
 model = load_model("model/model.keras")
