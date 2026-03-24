@@ -6,16 +6,17 @@ import os
 
 app = Flask(__name__)
 
-# Load CNN model (.h5)
+# Load model
 model = load_model("model/model.keras")
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # ✅ FIX 1: correct method
         file = request.files.get("file")
 
         if not file or file.filename == "":
@@ -23,7 +24,7 @@ def predict():
 
         print("File received:", file.filename)
 
-        # ✅ Read image safely (no extension check needed)
+        # Read image
         file_bytes = file.read()
         np_arr = np.frombuffer(file_bytes, np.uint8)
         img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -31,7 +32,7 @@ def predict():
         if img is None:
             return "Invalid image file"
 
-        # ✅ FIX 2: correct size
+        # Resize (IMPORTANT: must match training size)
         img = cv2.resize(img, (64, 64))
 
         # Normalize
@@ -40,15 +41,27 @@ def predict():
         # Reshape
         img = np.expand_dims(img, axis=0)
 
-        # ✅ FIX 3: correct prediction
-        prediction = model(img, training=False)
+        # 🔥 Correct prediction
+        prediction = model.predict(img)
 
-        pred_value = float(prediction[0][0])
+        print("RAW PREDICTION:", prediction)
 
-        if pred_value > 0.5:
-            result = "Suspicious Activity Detected 🚨"
+        # 🔥 Handle both binary and multi-class models
+        if prediction.shape[1] == 1:
+            pred_value = float(prediction[0][0])
+            print("Pred value:", pred_value)
+
+            if pred_value > 0.5:
+                result = "Suspicious Activity Detected 🚨"
+            else:
+                result = "Normal Activity ✅"
+
         else:
-            result = "Normal Activity ✅"
+            class_idx = np.argmax(prediction)
+            print("Class index:", class_idx)
+
+            classes = ["Normal Activity ✅", "Suspicious Activity Detected 🚨"]
+            result = classes[class_idx]
 
         return render_template("index.html", prediction=result)
 
@@ -57,8 +70,6 @@ def predict():
         return "ERROR: " + str(e)
 
 
-
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # for Render
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
