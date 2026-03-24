@@ -50,15 +50,14 @@ def predict():
 
             # Resize to model input
             img = cv2.resize(img, (64, 64))
-
             img = img.astype("float32") / 255.0
             img = np.expand_dims(img, axis=0)
 
-            # Faster prediction
-            prediction = model(img, training=False)
-            pred_value = float(prediction[0][0])
-            print("Prediction value:", pred_value)   # ✅ ADD THIS (for debugging)
-            confidence = round(pred_value * 100, 2)
+            # Prediction
+            pred = model(img, training=False)
+            pred_value = float(pred[0][0])
+
+            print("Prediction value (image):", pred_value)
 
         # ================= VIDEO =================
         elif filename.endswith(('.mp4', '.avi', '.mov')):
@@ -78,7 +77,7 @@ def predict():
 
                 frame_count += 1
 
-                # 🔥 Process only every 10th frame (VERY IMPORTANT)
+                # 🔥 Process only every 10th frame
                 if frame_count % 10 != 0:
                     continue
 
@@ -97,20 +96,25 @@ def predict():
 
             pred_value = sum(predictions) / len(predictions)
 
+            print("Prediction value (video avg):", pred_value)
+
         else:
             return "Unsupported file type"
 
         # ================= RESULT =================
-        if pred_value > 0.8:
-            result = f"Suspicious Activity Detected 🚨 ({confidence}%)"
+        print("Final prediction value:", pred_value)
+
+        if pred_value > 0.5:
+            result = "Suspicious Activity Detected 🚨"
         else:
-            result = f"Normal Activity ✅ ({100 - confidence}%)"
+            result = "Normal Activity ✅"
 
         return render_template("index.html", prediction=result)
 
     except Exception as e:
         print("Error:", str(e))
         return "ERROR: " + str(e)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
