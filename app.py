@@ -16,6 +16,7 @@ os.environ["TF_NUM_INTEROP_THREADS"] = "1"
 # Load CNN model
 model = load_model("model/model.keras")
 print("Model loaded successfully")
+print("Model input shape:", model.input_shape)
 
 @app.route("/")
 def home():
