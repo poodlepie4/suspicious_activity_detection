@@ -50,6 +50,10 @@ def predict():
 
             # Resize to model input
             img = cv2.resize(img, (64, 64))
+
+            #ADD THIS LINE (VERY IMPORTANT)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
             img = img.astype("float32") / 255.0
             img = np.expand_dims(img, axis=0)
 
@@ -82,11 +86,18 @@ def predict():
                     continue
 
                 frame = cv2.resize(frame, (64, 64))
+
+                # ADD THIS
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
                 frame = frame.astype("float32") / 255.0
                 frame = np.expand_dims(frame, axis=0)
 
+                
+
                 pred = model(frame, training=False)
                 predictions.append(float(pred[0][0]))
+                print("RAW PREDICTION:", pred_value)
 
             cap.release()
             os.remove(video_path)
