@@ -57,6 +57,8 @@ def predict():
             # Faster prediction
             prediction = model(img, training=False)
             pred_value = float(prediction[0][0])
+            print("Prediction value:", pred_value)   # ✅ ADD THIS (for debugging)
+            confidence = round(pred_value * 100, 2)
 
         # ================= VIDEO =================
         elif filename.endswith(('.mp4', '.avi', '.mov')):
@@ -99,10 +101,10 @@ def predict():
             return "Unsupported file type"
 
         # ================= RESULT =================
-        if pred_value > 0.5:
-            result = "Suspicious Activity Detected 🚨"
+        if pred_value > 0.8:
+            result = f"Suspicious Activity Detected 🚨 ({confidence}%)"
         else:
-            result = "Normal Activity ✅"
+            result = f"Normal Activity ✅ ({100 - confidence}%)"
 
         return render_template("index.html", prediction=result)
 
