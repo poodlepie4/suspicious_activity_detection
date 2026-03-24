@@ -116,7 +116,7 @@ def predict():
         # ================= RESULT =================
         print("Final prediction value:", pred_value)
 
-        if pred_value > 0.5:
+        if pred_value > 0.7:
             result = "Suspicious Activity Detected 🚨"
         else:
             result = "Normal Activity ✅"
