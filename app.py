@@ -95,9 +95,10 @@ def predict():
 
                 
 
-                pred = model(frame, training=False)
+                pred = model.predict(frame)
                 predictions.append(float(pred[0][0]))
-                print("RAW PREDICTION:", pred_value)
+                print("Frame prediction:", pred_value_frame)
+                predictions.append(pred_value_frame)
 
             cap.release()
             os.remove(video_path)
