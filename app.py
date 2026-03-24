@@ -31,10 +31,10 @@ def predict():
         if file.filename == "":
             return "No file uploaded"
 
-        filename = file.filename.lower()
+      
 
         # ---------------- IMAGE ----------------
-        if filename.endswith(('.png', '.jpg', '.jpeg')):
+       
 
             file_bytes = file.read()
             np_arr = np.frombuffer(file_bytes, np.uint8)
