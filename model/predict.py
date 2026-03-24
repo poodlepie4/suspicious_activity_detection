@@ -12,43 +12,51 @@ model = load_model("model/model.keras")
 @app.route("/")
 def home():
     return render_template("index.html")
-
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        file = request.files.grt("file")
+        # ✅ FIX 1: correct method
+        file = request.files.get("file")
 
-        if file.filename == "":
+        if not file or file.filename == "":
             return "No file uploaded"
 
-        # convert uploaded file to image
-        img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+        print("File received:", file.filename)
+
+        # ✅ Read image safely (no extension check needed)
+        file_bytes = file.read()
+        np_arr = np.frombuffer(file_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
         if img is None:
             return "Invalid image file"
 
-        # resize to training size
-        img = cv2.resize(img, (32,32))
+        # ✅ FIX 2: correct size
+        img = cv2.resize(img, (64, 64))
 
-        # normalize
+        # Normalize
         img = img.astype("float32") / 255.0
 
-        # reshape for model
+        # Reshape
         img = np.expand_dims(img, axis=0)
 
-        # prediction
-        prediction = model.predict(img, training=False)
+        # ✅ FIX 3: correct prediction
+        prediction = model(img, training=False)
 
-        if prediction[0][0] > 0.5:
-            result = "Suspicious Activity Detected"
+        pred_value = float(prediction[0][0])
+
+        if pred_value > 0.5:
+            result = "Suspicious Activity Detected 🚨"
         else:
-            result = "Normal Activity"
+            result = "Normal Activity ✅"
 
         return render_template("index.html", prediction=result)
 
     except Exception as e:
+        print("Error:", str(e))
         return "ERROR: " + str(e)
+
+
 
 
 if __name__ == "__main__":
